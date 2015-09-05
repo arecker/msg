@@ -1,4 +1,5 @@
 from unittest import TestCase
+from runpy import run_module
 
 from click.testing import CliRunner
 
@@ -23,3 +24,7 @@ class TestCliSanity(TestCase):
     def test_stage(self):
         result = self.runner.invoke(stage)
         self.assertEqual(result.exit_code, 0)
+
+    def test_module(self):
+        result = run_module('msg.cli')
+        self.assertIsInstance(result, dict)

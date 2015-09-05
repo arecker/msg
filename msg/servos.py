@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 from server import Accessor
+from exceptions import ServoConfigException
 
 
 class BaseServo(object):
@@ -30,6 +31,18 @@ class BaseServo(object):
 
     def go(self):
         raise NotImplementedError('servo requires a \'go\' routine')
+
+    def validate(self):
+        '''
+        ensures all required items are in the config
+        '''
+        if not getattr(self, 'required', None):
+            return self
+        missing = [x for x in self.required if not self.config.get(x, None)]
+        if not missing:
+            return self
+        raise ServoConfigException(
+            message='missing config items', missing=missing)
 
 
 class HandShake(BaseServo):

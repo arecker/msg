@@ -4,6 +4,7 @@ from msg.server import Accessor
 from msg.servos import BaseServo, HandShake
 from msg import server
 from msg.server import api
+from msg.exceptions import ServoConfigException
 from mocks import MockFabric
 
 
@@ -75,6 +76,48 @@ class TestBaseServo(TestCase):
         ]:
             with self.assertRaises(NotImplementedError):
                 getattr(MockServo(), method)()
+
+    def test_validate_no_required(self):
+        '''
+        servo should validate config just fine
+        if no required fields defined
+        '''
+        class MockServo(BaseServo):
+            pass
+
+        try:
+            MockServo().validate()
+        except:
+            self.fail('failed to validate with no required fields')
+
+    def test_validate_pass(self):
+        '''
+        servo should validate when required fields are fulfilled
+        '''
+        class MockServo(BaseServo):
+            required = ['something']
+
+        try:
+            MockServo({'something': 'hello'}).validate()
+        except:
+            self.fail('failed to validate with good config')
+
+    def test_validate_fail(self):
+        '''
+        servo should raise when config is missing required
+        fields.  should store missing items in the exception
+        '''
+        class MockServo(BaseServo):
+            required = ['something', 'here']
+        mock = {'something': 'hello'}
+        obj = MockServo(mock)
+        with self.assertRaises(ServoConfigException):
+            obj.validate()
+
+        try:
+            obj.validate()
+        except ServoConfigException as e:
+            self.assertEqual(e.missing, ['here', ])
 
 
 class ServoTestCase(TestCase):

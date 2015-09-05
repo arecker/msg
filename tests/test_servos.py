@@ -1,7 +1,10 @@
 from unittest import TestCase
 
 from msg.server import Accessor
-from msg.servos import BaseServo
+from msg.servos import BaseServo, HandShake
+from msg import server
+from msg.server import api
+from mocks import MockFabric
 
 
 class TestBaseServo(TestCase):
@@ -58,3 +61,51 @@ class TestBaseServo(TestCase):
 
         obj = MockServo(mock)
         self.assertEqual(obj.config, expected)
+
+    def test_not_implemented(self):
+        '''
+        custom servo without defined
+        routines should raise a NI expection
+        '''
+        class MockServo(BaseServo):
+            pass
+
+        for method in [
+            'go'
+        ]:
+            with self.assertRaises(NotImplementedError):
+                getattr(MockServo(), method)()
+
+
+class ServoTestCase(TestCase):
+    def setUp(self):
+        server.api = self.mock = MockFabric()
+
+    def tearDown(self):
+        server.api = api
+
+
+class TestHandShake(ServoTestCase):
+    '''
+    exercised the Handshake servo
+    '''
+    def test_default_go(self):
+        '''
+        should execute a message with the
+        default value if none given
+        '''
+        HandShake().go()
+        self.assertEqual(
+            self.mock.last_command,
+            'echo "Hellooooooo nurse"'
+        )
+
+    def test_go(self):
+        '''
+        should execute with a custom message
+        '''
+        HandShake({'message': 'test message'}).go()
+        self.assertEqual(
+            self.mock.last_command,
+            'echo "test message"'
+        )

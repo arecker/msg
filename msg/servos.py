@@ -23,10 +23,22 @@ class BaseServo(object):
         '''
         if not getattr(self, 'defaults', None):
             return data
-
         new = deepcopy(self.defaults)
-
         for k, v in data.iteritems():
             new[k] = v
-
         return new
+
+    def go(self):
+        raise NotImplementedError('servo requires a \'go\' routine')
+
+
+class HandShake(BaseServo):
+    '''
+    servo that echos a message through the host
+    '''
+    defaults = {
+        'message': 'Hellooooooo nurse'
+    }
+
+    def go(self):
+        self.run('echo "{message}"'.format(message=self.config['message']))

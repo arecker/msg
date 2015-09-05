@@ -1,13 +1,14 @@
 from unittest import TestCase
 import os
 
-from msg.config import parse
+from msg.config import Kicker
+from msg.exceptions import ServoConfigException
 from utils import get_root
 
 
-class TestConfig(TestCase):
+class TestKicker(TestCase):
     '''
-    exercises functions in the config module
+    exercises the kicker object
     '''
     mock = '''
 test: this is a test attribute
@@ -37,7 +38,7 @@ subitems:
         '''
         should return a data object from a yaml string
         '''
-        self.assertEqual(parse(data=self.mock), self.expected)
+        self.assertEqual(Kicker(data=self.mock).data, self.expected)
 
     def test_parse_file(self):
         '''
@@ -48,7 +49,7 @@ subitems:
             with open(target, 'w+') as file:
                 file.write(self.mock)
 
-            actual = parse(path=target)
+            actual = Kicker(path=target).data
             self.assertEqual(actual, self.expected)
         finally:
             try:
@@ -61,4 +62,5 @@ subitems:
         should just return an empty dict if
         given nothing to parse
         '''
-        self.assertEqual(parse(), {})
+        with self.assertRaises(ServoConfigException):
+            Kicker()

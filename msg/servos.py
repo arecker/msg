@@ -90,3 +90,10 @@ class Installer(BaseServo):
             command=self.config['command'],
             packages=' '.join(self.config['packages'])
         ))
+
+
+# key/class map
+manifest = {
+    'handshake': HandShake,
+    'install': Installer
+}

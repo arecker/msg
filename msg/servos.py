@@ -30,7 +30,17 @@ class BaseServo(object):
         return new
 
     def go(self):
+        '''
+        handle for the main servo routine
+        '''
         raise NotImplementedError('servo requires a \'go\' routine')
+
+    def nuke(self):
+        '''
+        handle for the routine that completely removes
+        anything done by the servo
+        '''
+        raise NotImplementedError('servo requires a \'nuke\' routine')
 
     def validate(self):
         '''
@@ -50,11 +60,18 @@ class HandShake(BaseServo):
     servo that echos a message through the host
     '''
     defaults = {
-        'message': 'Hellooooooo nurse'
+        'hello': 'Hellooooooo nurse',
+        'goodbye': 'You ever see a podrace?'
     }
 
+    def _run_message(self, message):
+        self.run('echo "{message}"'.format(message=message))
+
     def go(self):
-        self.run('echo "{message}"'.format(message=self.config['message']))
+        self._run_message(self.config['hello'])
+
+    def nuke(self):
+        self._run_message(self.config['goodbye'])
 
 
 class Installer(BaseServo):
@@ -65,7 +82,7 @@ class Installer(BaseServo):
         'packages',
     ]
     defaults = {
-        'command': 'sudo apt-get install -y'
+        'command': 'sudo apt-get install -y',
     }
 
     def go(self):

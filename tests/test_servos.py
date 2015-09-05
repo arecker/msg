@@ -71,9 +71,7 @@ class TestBaseServo(TestCase):
         class MockServo(BaseServo):
             pass
 
-        for method in [
-            'go'
-        ]:
+        for method in ['go', 'nuke']:
             with self.assertRaises(NotImplementedError):
                 getattr(MockServo(), method)()
 
@@ -147,7 +145,21 @@ class TestHandShake(ServoTestCase):
         '''
         should execute with a custom message
         '''
-        HandShake({'message': 'test message'}).go()
+        HandShake({'hello': 'test message'}).go()
+        self.assertEqual(
+            self.mock.last_command,
+            'echo "test message"'
+        )
+
+    def test_default_nuke(self):
+        HandShake().nuke()
+        self.assertEqual(
+            self.mock.last_command,
+            'echo "You ever see a podrace?"'
+        )
+
+    def test_nuke(self):
+        HandShake({'goodbye': 'test message'}).nuke()
         self.assertEqual(
             self.mock.last_command,
             'echo "test message"'

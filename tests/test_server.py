@@ -1,6 +1,7 @@
 from unittest import TestCase
 
 from fabric.api import env
+from fabric.exceptions import NetworkError
 
 from msg.server import Accessor
 
@@ -48,3 +49,25 @@ class TestAccessor(TestCase):
 
         self.assertEqual(env['host_string'], expected['host'])
         self.assertEqual(env['password'], expected['pass'])
+
+    def test_run(self):
+        try:
+            passed = True
+            Accessor.host('localhost')
+            Accessor.run('echo hello', timeout=5)
+        except NetworkError:
+            pass
+        except:
+            passed = False
+        self.assertTrue(passed)
+
+    def test_sudo(self):
+        try:
+            passed = True
+            Accessor.host('localhost')
+            Accessor.sudo('echo hello', timeout=5)
+        except NetworkError:
+            pass
+        except:
+            passed = False
+        self.assertTrue(passed)

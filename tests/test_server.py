@@ -4,19 +4,7 @@ from fabric import api
 
 from msg import server
 from msg.server import Accessor
-
-
-class MockFabric(object):
-    def __init__(self):
-        self.env = {
-            'use_ssh_config': True
-        }
-        self.run = self._record
-        self.sudo = self._record
-
-    def _record(self, *args, **kwargs):
-        self._args = args
-        self._kwargs = kwargs
+from mocks import MockFabric
 
 
 class TestAccessorEnvironment(TestCase):
@@ -76,17 +64,11 @@ class TestAccessorCommands(TestCase):
         server.api = api
 
     def test_run(self):
-        Accessor.host('localhost')
         Accessor.run('echo hello', timeout=5)
-        self.assertEqual(''.join(self.mock._args), ''.join(self.mock._args))
-        self.assertEqual(len(set(dict(timeout=5)) ^ set(self.mock._kwargs)), 0)
+        self.assertEqual(self.mock.last_command, 'echo hello')
+        self.assertEqual(self.mock.last_kwargs, dict(timeout=5))
 
     def test_sudo(self):
-        Accessor.host('test-host').password('testpass')
         Accessor.sudo('echo boo')
-        self.assertEqual(''.join(self.mock._args), ''.join(self.mock._args))
-        self.assertEqual(len(set(dict(
-            use_ssh_config=True,
-            password='testpass',
-            host_string='test-host'
-        )) ^ set(self.mock.env)), 0)
+        self.assertEqual(self.mock.last_command, 'echo boo')
+        self.assertEqual(self.mock.last_kwargs, {})

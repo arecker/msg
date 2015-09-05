@@ -39,7 +39,7 @@ class BaseServo(object):
         if not getattr(self, 'required', None):
             return self
         missing = [x for x in self.required if not self.config.get(x, None)]
-        if not missing:
+        if len(missing) < 1:
             return self
         raise ServoConfigException(
             message='missing config items', missing=missing)
@@ -55,3 +55,21 @@ class HandShake(BaseServo):
 
     def go(self):
         self.run('echo "{message}"'.format(message=self.config['message']))
+
+
+class Installer(BaseServo):
+    '''
+    servo that installs a list of packages
+    '''
+    required = [
+        'packages',
+    ]
+    defaults = {
+        'command': 'sudo apt-get install -y'
+    }
+
+    def go(self):
+        self.run('{command} {packages}'.format(
+            command=self.config['command'],
+            packages=' '.join(self.config['packages'])
+        ))

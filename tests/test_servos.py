@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from msg.server import Accessor
-from msg.servos import BaseServo, HandShake
+from msg.servos import BaseServo, HandShake, Installer
 from msg import server
 from msg.server import api
 from msg.exceptions import ServoConfigException
@@ -130,7 +130,7 @@ class ServoTestCase(TestCase):
 
 class TestHandShake(ServoTestCase):
     '''
-    exercised the Handshake servo
+    exercise the Handshake servo
     '''
     def test_default_go(self):
         '''
@@ -151,4 +151,44 @@ class TestHandShake(ServoTestCase):
         self.assertEqual(
             self.mock.last_command,
             'echo "test message"'
+        )
+
+
+class TestInstaller(ServoTestCase):
+    '''
+    excercise installer servo
+    '''
+    def test_validate(self):
+        obj = Installer({})
+        try:
+            obj.validate()
+            self.fail('installer did not enforce requirements')
+        except ServoConfigException as e:
+            self.assertEqual(e.missing, ['packages'])
+
+    def test_defaults(self):
+        Installer({
+            'packages': [
+                'python',
+                'nmap',
+                'mysql'
+            ]
+        }).validate().go()
+        self.assertEqual(
+            self.mock.last_command,
+            'sudo apt-get install -y python nmap mysql'
+        )
+
+    def test_command_override(self):
+        Installer({
+            'command': 'sudo pacman -S',
+            'packages': [
+                'python',
+                'nmap',
+                'mysql'
+            ]
+        }).validate().go()
+        self.assertEqual(
+            self.mock.last_command,
+            'sudo pacman -S python nmap mysql'
         )

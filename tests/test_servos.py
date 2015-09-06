@@ -4,7 +4,7 @@ from msg.server import Accessor
 from msg.servos import BaseServo, HandShake, Installer
 from msg import server
 from msg.server import api
-from msg.exceptions import ServoConfigException
+from msg.exceptions import ServoMissingFieldsException
 from mocks import MockFabric
 
 
@@ -109,13 +109,13 @@ class TestBaseServo(TestCase):
             required = ['something', 'here']
         mock = {'something': 'hello'}
         obj = MockServo(mock)
-        with self.assertRaises(ServoConfigException):
+        with self.assertRaises(ServoMissingFieldsException):
             obj.validate()
 
         try:
             obj.validate()
-        except ServoConfigException as e:
-            self.assertEqual(e.missing, ['here', ])
+        except ServoMissingFieldsException as e:
+            self.assertEqual(e.fields, ['here', ])
 
 
 class ServoTestCase(TestCase):
@@ -175,8 +175,8 @@ class TestInstaller(ServoTestCase):
         try:
             obj.validate()
             self.fail('installer did not enforce requirements')
-        except ServoConfigException as e:
-            self.assertEqual(e.missing, ['packages'])
+        except ServoMissingFieldsException as e:
+            self.assertEqual(e.fields, ['packages'])
 
     def test_defaults(self):
         Installer({

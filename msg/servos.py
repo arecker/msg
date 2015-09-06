@@ -1,7 +1,8 @@
 from copy import deepcopy
 
 from server import Accessor
-from exceptions import ServoConfigException
+from exceptions import ServoMissingFieldsException
+
 
 
 class BaseServo(object):
@@ -51,8 +52,7 @@ class BaseServo(object):
         missing = [x for x in self.required if not self.config.get(x, None)]
         if len(missing) < 1:
             return self
-        raise ServoConfigException(
-            message='missing config items', missing=missing)
+        raise ServoMissingFieldsException(missing)
 
 
 class HandShake(BaseServo):

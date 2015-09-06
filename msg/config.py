@@ -1,6 +1,6 @@
 import yaml
 
-from exceptions import ServoConfigException, MSGException
+from . import exceptions
 from server import Accessor
 from servos import manifest
 
@@ -18,29 +18,23 @@ class Kicker(object):
         try:
             if data:
                 self.data = yaml.load(data)
-            elif path:
+            else:
                 with open(path) as file:
                     self.data = yaml.load(file)
-            else:
-                raise
         except:
-            raise MSGException(
-                message='could not parse the config file'
-            )
+            raise exceptions.MSGConfigParseException
 
     def validate(self, host_string):
-        try:  # check host
+        try:
             Accessor.host(self.data['host'][host_string])
         except:
-            raise MSGException(
-                message='could not find host "{0}" in config'.format(
-                    host_string))
+            raise exceptions.MSGMissingHostException(host_string)
 
         # Validate servos
         errors = []
         servos = self.data.get('servos', None)
         if not servos or len(servos) < 1:
-            raise ServoConfigException('no servos listed')
+            raise exceptions.MSGNoServosException
 
         self.servos = []
         for item in servos:
@@ -53,11 +47,11 @@ class Kicker(object):
         for obj in self.servos:
             try:
                 obj.validate()
-            except ServoConfigException as e:
+            except exceptions.ServoException as e:
                 errors.append(e)
 
         if len(errors) > 0:
-            raise MSGException(errors=errors)
+            raise exceptions.MSGErrorListException(errors)
 
         return self
 

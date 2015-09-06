@@ -1,14 +1,61 @@
 class MSGException(Exception):
-    def __init__(self, message=None, config_errors=None):
-        super(MSGException, self).__init__(message)
+    def __init__(self, *args, **kwargs):
+        super(MSGException, self).__init__(args, kwargs)
 
     def report(self):
-        pass
+        print(self.message)
+        exit(1)
 
 
+class MSGConfigParseException(MSGException):
+    message = '''There was an error parsing the config file.
+Are you sure that's valid yaml?'''
 
-class ServoConfigException(Exception):
-    def __init__(self, message=None, missing=None, host=None):
-        super(ServoConfigException, self).__init__(message)
-        self.missing = missing
-        self.host = host
+
+class MSGMissingHostException(MSGException):
+    def __init__(self, tried_host):
+        super(MSGMissingHostException, self).__init__()
+        self.host = tried_host
+
+    def report(self):
+        print('Could not find host {0} in config'.format(self.host))
+        exit(1)
+
+
+class MSGNoServosException(MSGException):
+    message = 'No servos listed in config.  Nothing to do.'
+
+
+class MSGErrorListException(MSGException):
+    message = '''There were some problems with how things were set up:'''
+
+    def __init__(self, errors):
+        super(MSGException, self).__init__()
+        self.errors = errors
+
+    def report(self):
+        print(self.message)
+        for e in self.errors:
+            e.report()
+        exit(1)
+
+
+class ServoException(Exception):
+    def __init__(self):
+        super(MSGException, self).__init__()
+
+    def report(self):
+        print(self.message)
+        exit(1)
+
+
+class ServoMissingFieldsException(ServoException):
+    def __init__(self, fields):
+        super(ServoException, self).__init__()
+        self.fields = fields
+
+    def report(self):
+        print('missing {fields}'.format(
+            fields=', '.join(self.fields)
+        ))
+        exit(1)

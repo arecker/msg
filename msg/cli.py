@@ -35,4 +35,3 @@ def go(path, host):
         Kicker(path=path).validate(host).go()
     except MSGException as e:
         e.report()
-        exit(1)

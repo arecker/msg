@@ -6,7 +6,7 @@ from click.testing import CliRunner
 from msg.cli import main
 from msg import server
 from msg.server import api
-from msg.config import Kicker
+from msg import exceptions
 from mocks import MockFabric
 from utils import get_root
 
@@ -33,8 +33,8 @@ class MockMSGTestCase(TestCase):
 class TestHandShakeInstallerConfig(MockMSGTestCase):
     config_data = '''
 host:
-  prod: 'prod-server'
-  stage: 'stage-server'
+  prod: 'prod-host'
+  stage: 'stage-host'
 
 servos:
   - handshake
@@ -46,7 +46,6 @@ servos:
 
     def test_it(self):
         self.cli.invoke(main, ['prod', self.config])
-
         self.assertEqual(self.mock.command_history, [
             'echo "Hellooooooo nurse"',
             'sudo apt-get install -y python python-pip'
@@ -72,8 +71,26 @@ servos:
 
     def test_it(self):
         self.cli.invoke(main, ['stage', self.config])
-
         self.assertEqual(self.mock.command_history, [
             'echo "I am overriding the default message"',
             'sudo pacman -S python python-pip mysql'
         ])
+
+
+class TestInstallerMissingReqs(MockMSGTestCase):
+    config_data = '''
+host:
+  prod: 'prod-host'
+  stage: 'stage-host'
+
+servos:
+  - handshake
+  - install
+'''
+
+    def test_it(self):
+        try:
+            self.cli.invoke(main, ['stage', self.config])
+        except exceptions.MSGException as e:
+            self.assertEqual(len(e.errors), 1)
+            self.assertEqual(e.errors[0].fields, ['packages'])

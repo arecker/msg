@@ -1,25 +1,38 @@
 import click
 
+from config import Kicker
+from exceptions import MSGException
+
 
 @click.group()
 def main():
     '''
-    the low budget deployment tool
+    the tasty server tool
     '''
     pass
 
 
 @main.command()
-def prod():
+@click.argument('config', type=click.Path(exists=True))
+def prod(config):
     '''
     execute a config on a production host
     '''
-    pass
+    go(config, 'prod')
 
 
 @main.command()
-def stage():
+@click.argument('config', type=click.Path(exists=True))
+def stage(config):
     '''
     execute a config on a staging host
     '''
-    pass
+    go(config, 'stage')
+
+
+def go(path, host):
+    try:
+        Kicker(path=path).validate(host).go()
+    except MSGException as e:
+        e.report()
+        exit(1)

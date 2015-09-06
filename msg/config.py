@@ -1,6 +1,6 @@
 import yaml
 
-from exceptions import ServoConfigException
+from exceptions import ServoConfigException, MSGException
 from server import Accessor
 from servos import manifest
 
@@ -24,17 +24,17 @@ class Kicker(object):
             else:
                 raise
         except:
-            raise ServoConfigException('had an issue reading the config')
+            raise MSGException(
+                message='could not parse the config file'
+            )
 
     def validate(self, host_string):
-
-        # Check host
-        try:
-            host = self.data['host'][host_string]
+        try:  # check host
+            Accessor.host(self.data['host'][host_string])
         except:
-            raise ServoConfigException(
-                'could not figure out host', host=host_string)
-        Accessor.host(host)
+            raise MSGException(
+                message='could not find host "{0}" in config'.format(
+                    host_string))
 
         # Validate servos
         errors = []
@@ -57,7 +57,7 @@ class Kicker(object):
                 errors.append(e)
 
         if len(errors) > 0:
-            print('There are {0} problems'.format(len(errors)))
+            raise MSGException(errors=errors)
 
         return self
 

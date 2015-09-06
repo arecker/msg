@@ -2,7 +2,7 @@ from unittest import TestCase
 import os
 
 from msg.config import Kicker
-from msg.exceptions import ServoConfigException
+from msg.exceptions import ServoConfigException, MSGException
 from utils import get_root
 
 
@@ -62,5 +62,5 @@ subitems:
         should just return an empty dict if
         given nothing to parse
         '''
-        with self.assertRaises(ServoConfigException):
+        with self.assertRaises(MSGException):
             Kicker()

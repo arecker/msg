@@ -18,7 +18,7 @@ class MSGMissingHostException(MSGException):
         self.host = tried_host
 
     def report(self):
-        print('Could not find host {0} in config'.format(self.host))
+        print('Could not find host "{0}" in config'.format(self.host))
         exit(1)
 
 
@@ -55,7 +55,7 @@ class ServoMissingFieldsException(ServoException):
         self.fields = fields
 
     def report(self):
-        print('missing {fields}'.format(
+        print('missing the following config items: {fields}'.format(
             fields=', '.join(self.fields)
         ))
         exit(1)

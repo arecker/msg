@@ -1,6 +1,9 @@
 from unittest import TestCase
 import os
 
+from click.testing import CliRunner
+
+from msg.cli import main
 from msg import server
 from msg.server import api
 from msg.config import Kicker
@@ -13,6 +16,7 @@ class MockMSGTestCase(TestCase):
     writes out config file and removes it
     '''
     def setUp(self):
+        self.cli = CliRunner()
         server.api = self.mock = MockFabric()
         self.config = os.path.join(get_root(), 'test_config.yml')
         with open(self.config, 'w+') as file:
@@ -41,7 +45,7 @@ servos:
 '''
 
     def test_it(self):
-        Kicker(path=self.config).validate('prod').go()
+        self.cli.invoke(main, ['prod', self.config])
 
         self.assertEqual(self.mock.command_history, [
             'echo "Hellooooooo nurse"',
@@ -67,7 +71,7 @@ servos:
 '''
 
     def test_it(self):
-        Kicker(path=self.config).validate('prod').go()
+        self.cli.invoke(main, ['stage', self.config])
 
         self.assertEqual(self.mock.command_history, [
             'echo "I am overriding the default message"',

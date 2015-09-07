@@ -40,13 +40,8 @@ class MSGErrorListException(MSGException):
         exit(1)
 
 
-class ServoException(Exception):
-    def __init__(self):
-        super(MSGException, self).__init__()
-
-    def report(self):
-        print(self.message)
-        exit(1)
+class ServoException(MSGException):
+    pass
 
 
 class ServoMissingFieldsException(ServoException):

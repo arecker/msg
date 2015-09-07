@@ -168,12 +168,23 @@ class TestInstaller(MockFabricTestCase):
         except ServoMissingFieldsException as e:
             self.assertEqual(e.fields, ['packages'])
 
+    def test_validate_short(self):
+        obj = servos.Installer('mysql')
+        obj.validate()
+
     def test_defaults(self):
         servos.Installer({
             'packages': ['python', 'nmap', 'mysql']
         }).validate().go()
         self.assertEqual(self.mock.last, {
             'command': 'apt-get install -y python nmap mysql',
+            'sudo': True
+        })
+
+    def test_short(self):
+        servos.Installer('python').validate().go()
+        self.assertEqual(self.mock.last, {
+            'command': 'apt-get install -y python',
             'sudo': True
         })
 
@@ -237,3 +248,33 @@ class TestPut(MockFabricTestCase):
             servos.Put({}).validate()
         except ServoMissingFieldsException as e:
             self.assertEqual(e.fields, ['source', 'destination'])
+
+
+class TestClone(MockFabricTestCase):
+    def test_validate_pass(self):
+        try:
+            servos.Clone({
+                'url': 'google.com',
+                'target': 'lskdjflksdflkdj'
+            }).validate()
+        except:
+            self.fail('valid clone config failed')
+
+    def test_validate_fail(self):
+        try:
+            servos.Clone({
+                'url': 'google.com'
+            }).validate()
+            self.fail('invalid clone config passed')
+        except ServoMissingFieldsException as e:
+            self.assertEqual(e.fields, ['target'])
+
+    def test_go(self):
+        servos.Clone({
+            'url': 'http://google.com/.git',
+            'target': '~/google'
+        }).validate().go()
+        self.assertEqual(self.mock.last, {
+            'command': 'git clone http://google.com/.git ~/google',
+            'sudo': False
+        })

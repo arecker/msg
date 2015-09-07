@@ -92,11 +92,12 @@ servos:
 class TestMissingFields(MockFabricTestCase):
     config_data = '''
 host:
-  stage: hello
-  prod: woop
+  prod: 'test-host'
+  stage: 'test-host'
 
 servos:
-  - install
+  - clone:
+      url: https://github.com/arecker/msg.git
 '''
 
     def test(self):

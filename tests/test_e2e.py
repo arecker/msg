@@ -117,3 +117,33 @@ servos:
     def test(self):
         self.prod()
         self.compare()
+
+
+class TestInstallAndClone(MockFabricTestCase):
+    config_data = '''
+host:
+  prod: 'test-host'
+  stage: 'test-host'
+
+servos:
+  - install: git
+  - clone:
+      url: https://github.com/arecker/msg.git
+      target: ~/git/msg
+'''
+
+    expected = [{
+        'command': 'apt-get install -y git',
+        'sudo': True
+    }, {
+        'command': ' '.join([
+            'git', 'clone',
+            'https://github.com/arecker/msg.git',
+            '~/git/msg'
+        ]),
+        'sudo': False
+    }]
+
+    def test(self):
+        self.prod()
+        self.compare()

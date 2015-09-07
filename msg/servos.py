@@ -86,11 +86,18 @@ class Installer(BaseServo):
         'command': 'apt-get install -y',
     }
 
+    def __init__(self, data):
+        if not isinstance(data, dict):
+            data = {
+                'command': self.defaults['command'],
+                'packages': [data]
+            }
+        super(Installer, self).__init__(data)
+
     def go(self):
-        self.sudo('{command} {packages}'.format(
-            command=self.config['command'],
-            packages=' '.join(self.config['packages'])
-        ))
+        packages = ' '.join(self.config['packages'])
+        command = self.config['command']
+        self.sudo('{0} {1}'.format(command, packages))
 
 
 class Host(BaseServo):
@@ -123,10 +130,25 @@ class Host(BaseServo):
 
 
 class Put(BaseServo):
+    '''
+    servo that puts a payload on the server
+    '''
     required = ['source', 'destination']
 
     def go(self):
         self.put(self.config['source'], self.config['destination'], False)
+
+
+class Clone(BaseServo):
+    '''
+    servo that clones a git repo
+    '''
+    required = ['url', 'target']
+
+    def go(self):
+        url = self.config['url']
+        target = self.config['target']
+        self.run('git clone {0} {1}'.format(url, target))
 
 
 # key/class map
@@ -134,5 +156,6 @@ manifest = {
     'handshake': HandShake,
     'install': Installer,
     'host': Host,
-    'put': Put
+    'put': Put,
+    'clone': Clone
 }

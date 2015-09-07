@@ -71,7 +71,7 @@ host:
 '''
 
     def test(self):
-        result = self.prod()
+        result = self.stage()
         self.assertEqual(result.exit_code, 1)
 
 

@@ -121,6 +121,7 @@ class TestBaseServo(TestCase):
 class ServoTestCase(TestCase):
     def setUp(self):
         server.api = self.mock = MockFabric()
+        server.files = self.mock._files
 
     def tearDown(self):
         server.api = api
@@ -219,3 +220,14 @@ class TestHost(ServoTestCase):
             servos.Host('').validate()
         except ServoMissingFieldsException as e:
             self.assertEqual(e.fields, ['host'])
+
+    def test_run_short(self):
+        '''
+        should append a hostname to the hostfile
+        '''
+        servos.Host('alexrecker.com').validate().go()
+        self.assertEqual(self.mock.last, {
+            'file': '/etc/hosts',
+            'append': '127.0.0.1     alexrecker.com',
+            'sudo': True
+        })

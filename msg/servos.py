@@ -16,6 +16,7 @@ class BaseServo(object):
         # Pass through to accessor api
         self.run = Accessor.run
         self.sudo = Accessor.sudo
+        self.append = Accessor.append
 
     def _build_config(self, data):
         '''
@@ -97,6 +98,7 @@ class Host(BaseServo):
     '''
     def __init__(self, data):
         super(Host, self).__init__(data)
+        self.to_host = lambda x, y: '{0}     {1}'.format(x, y)
         self.short = not isinstance(self.config, dict)
 
     def validate(self):
@@ -107,6 +109,16 @@ class Host(BaseServo):
         if self.short:
             if len(self.config) < 1:
                 raise ServoMissingFieldsException(fields=['host'])
+        else:
+            raise NotImplementedError('only short mode available')
+        return self
+
+    def go(self):
+        if self.short:
+            self._short_go()
+
+    def _short_go(self):
+        self.append('/etc/hosts', self.to_host('127.0.0.1', self.config), True)
 
 
 # key/class map

@@ -59,6 +59,7 @@ class TestAccessorCommands(TestCase):
     '''
     def setUp(self):
         server.api = self.mock = MockFabric()
+        server.files = self.mock._files
 
     def tearDown(self):
         server.api = api
@@ -75,4 +76,12 @@ class TestAccessorCommands(TestCase):
         self.assertEqual(self.mock.last, {
             'command': 'echo boo',
             'sudo': True
+        })
+
+    def test_append(self):
+        Accessor.append('test.txt', 'hello there', False)
+        self.assertEqual(self.mock.last, {
+            'file': 'test.txt',
+            'append': 'hello there',
+            'sudo': False
         })

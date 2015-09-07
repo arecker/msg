@@ -18,6 +18,7 @@ class MockMSGTestCase(TestCase):
     def setUp(self):
         self.cli = CliRunner()
         server.api = self.mock = MockFabric()
+        server.files = self.mock._files
         self.config = os.path.join(get_root(), 'test_config.yml')
         with open(self.config, 'w+') as file:
             file.write(self.config_data)
@@ -104,3 +105,22 @@ servos:
         except exceptions.MSGException as e:
             self.assertEqual(len(e.errors), 1)
             self.assertEqual(e.errors[0].fields, ['packages'])
+
+
+class TestHost(MockMSGTestCase):
+    config_data = '''
+host:
+  prod: 'prod-host'
+  stage: 'stage-host'
+
+servos:
+  - host: alexrecker.com
+'''
+    expected = [{
+        'file': '/etc/hosts',
+        'append': '127.0.0.1     alexrecker.com',
+        'sudo': True
+    }]
+
+    def test(self):
+        super(TestHost, self).prod()

@@ -1,4 +1,5 @@
 from fabric import api
+from fabric.contrib import files
 
 
 class Accessor(object):
@@ -25,3 +26,7 @@ class Accessor(object):
     @staticmethod
     def sudo(*args, **kwargs):
         return api.sudo(*args, **kwargs)
+
+    @staticmethod
+    def append(*args, **kwargs):
+        return files.append(*args, **kwargs)

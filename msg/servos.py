@@ -79,19 +79,13 @@ class Installer(BaseServo):
     '''
     servo that installs a list of packages
     '''
-    required = [
-        'packages',
-    ]
-    defaults = {
-        'command': 'apt-get install -y',
-    }
+    required = ['packages']
+    defaults = {'command': 'apt-get install -y'}
 
     def __init__(self, data):
         if not isinstance(data, dict):
-            data = {
-                'command': self.defaults['command'],
-                'packages': [data]
-            }
+            data = {'command': self.defaults['command'],
+                    'packages': [data]}
         super(Installer, self).__init__(data)
 
     def go(self):

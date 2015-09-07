@@ -220,3 +220,20 @@ class TestHost(MockFabricTestCase):
             'append': '127.0.0.1     alexrecker.com',
             'sudo': True
         })
+
+
+class TestPut(MockFabricTestCase):
+    def test_validate_pass(self):
+        try:
+            servos.Put({
+                'source': 'blah blah blah',
+                'destination': 'blah blah blah'
+            }).validate()
+        except:
+            self.fail('valid put config failed')
+
+    def test_validate_fail(self):
+        try:
+            servos.Put({}).validate()
+        except ServoMissingFieldsException as e:
+            self.assertEqual(e.fields, ['source', 'destination'])

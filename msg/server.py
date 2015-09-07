@@ -1,4 +1,4 @@
-from fabric import api
+from fabric import api, operations
 from fabric.contrib import files
 
 
@@ -30,3 +30,7 @@ class Accessor(object):
     @staticmethod
     def append(*args, **kwargs):
         return files.append(*args, **kwargs)
+
+    @staticmethod
+    def put(*args, **kwargs):
+        return operations.put(*args, **kwargs)

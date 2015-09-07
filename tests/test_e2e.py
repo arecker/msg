@@ -94,3 +94,26 @@ servos:
     def test(self):
         self.prod()
         self.compare()
+
+
+class TestPut(MockFabricTestCase):
+    config_data = '''
+host:
+  prod: prod-host
+  stage: stage-host
+
+servos:
+  - put:
+      source: '/local/file'
+      destination: '/remote/location'
+'''
+
+    expected = [{
+        'put': '/local/file',
+        'destination': '/remote/location',
+        'sudo': False
+    }]
+
+    def test(self):
+        self.prod()
+        self.compare()

@@ -25,6 +25,21 @@ class MockFiles(object):
         })
 
 
+class MockOperations(object):
+    '''
+    mock fabric.opterations
+    '''
+    def __init__(self, callback):
+        self.callback = callback
+
+    def put(self, source, destination, sudo):
+        self.callback({
+            'put': source,
+            'destination': destination,
+            'sudo': sudo
+        })
+
+
 class MockFabric(object):
     '''
     mock fabric commands
@@ -35,7 +50,8 @@ class MockFabric(object):
         self.history = []
         self.last = {}
         self.env = {}
-        self._files = MockFiles(self._files_command)
+        self._files = MockFiles(self._callback)
+        self._operations = MockOperations(self._callback)
 
     def sudo(self, cmd):
         self._shell_command(cmd, True)
@@ -43,7 +59,7 @@ class MockFabric(object):
     def run(self, cmd):
         self._shell_command(cmd, False)
 
-    def _files_command(self, obj):
+    def _callback(self, obj):
         self.history.append(obj)
         self.last = obj
 
@@ -65,6 +81,7 @@ class MockFabricTestCase(TestCase):
         self.cli = CliRunner()
         server.api = self.mock = MockFabric()
         server.files = self.mock._files
+        server.operations = self.mock._operations
         if getattr(self, 'config_data', None):
             self._write_config()
 

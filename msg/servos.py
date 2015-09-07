@@ -17,6 +17,7 @@ class BaseServo(object):
         self.run = Accessor.run
         self.sudo = Accessor.sudo
         self.append = Accessor.append
+        self.put = Accessor.put
 
     def _build_config(self, data):
         '''
@@ -121,9 +122,17 @@ class Host(BaseServo):
         self.append('/etc/hosts', self.to_host('127.0.0.1', self.config), True)
 
 
+class Put(BaseServo):
+    required = ['source', 'destination']
+
+    def go(self):
+        self.put(self.config['source'], self.config['destination'], False)
+
+
 # key/class map
 manifest = {
     'handshake': HandShake,
     'install': Installer,
-    'host': Host
+    'host': Host,
+    'put': Put
 }

@@ -77,3 +77,11 @@ class TestAccessorCommands(MockFabricTestCase):
             'append': 'hello there',
             'sudo': False
         })
+
+    def test_put(self):
+        Accessor.put('source file', 'destination file', False)
+        self.assertEqual(self.mock.last, {
+            'put': 'source file',
+            'destination': 'destination file',
+            'sudo': False
+        })

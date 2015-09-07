@@ -24,7 +24,8 @@ servos:
     }]
 
     def test(self):
-        self.cli_prod()
+        self.prod()
+        self.compare()
 
 
 class TestHandShakeInstallerConfigOverrides(MockFabricTestCase):
@@ -52,7 +53,8 @@ servos:
     }]
 
     def test(self):
-        self.cli_prod()
+        self.prod()
+        self.compare()
 
 
 class TestInstallerMissingReqs(MockFabricTestCase):
@@ -68,7 +70,7 @@ servos:
 
     def test_it(self):
         try:
-            self.cli_prod
+            self.prod()
         except exceptions.MSGException as e:
             self.assertEqual(len(e.errors), 1)
             self.assertEqual(e.errors[0].fields, ['packages'])
@@ -90,4 +92,5 @@ servos:
     }]
 
     def test(self):
-        self.cli_prod()
+        self.prod()
+        self.compare()

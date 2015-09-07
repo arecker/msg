@@ -85,12 +85,14 @@ class MockFabricTestCase(TestCase):
         except OSError:
             pass
 
-    def cli_prod(self):
-        self._invoke_and_compare('prod')
+    def prod(self):
+        return self._invoke('prod')
 
-    def cli_stage(self):
-        self._invoke_and_compare('stage')
+    def stage(self):
+        return self._invoke('stage')
 
-    def _invoke_and_compare(self, env):
-        self.cli.invoke(main, [env, self.config])
+    def _invoke(self, env):
+        return self.cli.invoke(main, [env, self.config])
+
+    def compare(self):
         self.assertEqual(self.mock.history, self.expected)

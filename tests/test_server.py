@@ -2,9 +2,8 @@ from unittest import TestCase
 
 from fabric import api
 
-from msg import server
+from mocks import MockFabricTestCase
 from msg.server import Accessor
-from mocks import MockFabric
 
 
 class TestAccessorEnvironment(TestCase):
@@ -52,18 +51,11 @@ class TestAccessorEnvironment(TestCase):
         self.assertEqual(api.env['password'], expected['pass'])
 
 
-class TestAccessorCommands(TestCase):
+class TestAccessorCommands(MockFabricTestCase):
     '''
     exercises command pass through to
     fabric using mock fabric api
     '''
-    def setUp(self):
-        server.api = self.mock = MockFabric()
-        server.files = self.mock._files
-
-    def tearDown(self):
-        server.api = api
-
     def test_run(self):
         Accessor.run('echo hello')
         self.assertEqual(self.mock.last, {

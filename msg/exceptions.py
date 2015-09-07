@@ -53,4 +53,3 @@ class ServoMissingFieldsException(ServoException):
         print('missing the following config items: {fields}'.format(
             fields=', '.join(self.fields)
         ))
-        exit(1)

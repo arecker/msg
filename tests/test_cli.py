@@ -81,3 +81,18 @@ servos:
     def test(self):
         result = self.prod()
         self.assertEqual(result.exit_code, 1)
+
+
+class TestMissingFields(MockFabricTestCase):
+    config_data = '''
+host:
+  stage: hello
+  prod: woop
+
+servos:
+  - install
+'''
+
+    def test(self):
+        result = self.prod()
+        self.assertEqual(result.exit_code, 1)

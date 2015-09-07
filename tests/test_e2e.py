@@ -22,6 +22,10 @@ class MockMSGTestCase(TestCase):
         with open(self.config, 'w+') as file:
             file.write(self.config_data)
 
+    def prod(self):
+        self.cli.invoke(main, ['prod', self.config])
+        self.assertEqual(self.mock.history, self.expected)
+
     def tearDown(self):
         server.api = api
         try:
@@ -43,13 +47,16 @@ servos:
         - python
         - python-pip
 '''
+    expected = [{
+        'command': 'echo "Hellooooooo nurse"',
+        'sudo': False
+    }, {
+        'command': 'apt-get install -y python python-pip',
+        'sudo': True
+    }]
 
-    def test_it(self):
-        self.cli.invoke(main, ['prod', self.config])
-        self.assertEqual(self.mock.command_history, [
-            'echo "Hellooooooo nurse"',
-            'sudo apt-get install -y python python-pip'
-        ])
+    def test(self):
+        super(TestHandShakeInstallerConfig, self).prod()
 
 
 class TestHandShakeInstallerConfigOverrides(MockMSGTestCase):
@@ -62,19 +69,22 @@ servos:
   - handshake:
       hello: 'I am overriding the default message'
   - install:
-      command: sudo pacman -S
+      command: pacman -S
       packages:
         - python
         - python-pip
         - mysql
 '''
+    expected = [{
+        'command': 'echo "I am overriding the default message"',
+        'sudo': False
+    }, {
+        'command': 'pacman -S python python-pip mysql',
+        'sudo': True
+    }]
 
-    def test_it(self):
-        self.cli.invoke(main, ['stage', self.config])
-        self.assertEqual(self.mock.command_history, [
-            'echo "I am overriding the default message"',
-            'sudo pacman -S python python-pip mysql'
-        ])
+    def test(self):
+        super(TestHandShakeInstallerConfigOverrides, self).prod()
 
 
 class TestInstallerMissingReqs(MockMSGTestCase):

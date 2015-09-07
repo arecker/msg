@@ -4,7 +4,6 @@ from server import Accessor
 from exceptions import ServoMissingFieldsException
 
 
-
 class BaseServo(object):
     '''
     base object for a servo
@@ -82,11 +81,11 @@ class Installer(BaseServo):
         'packages',
     ]
     defaults = {
-        'command': 'sudo apt-get install -y',
+        'command': 'apt-get install -y',
     }
 
     def go(self):
-        self.run('{command} {packages}'.format(
+        self.sudo('{command} {packages}'.format(
             command=self.config['command'],
             packages=' '.join(self.config['packages'])
         ))

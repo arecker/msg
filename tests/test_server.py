@@ -64,11 +64,15 @@ class TestAccessorCommands(TestCase):
         server.api = api
 
     def test_run(self):
-        Accessor.run('echo hello', timeout=5)
-        self.assertEqual(self.mock.last_command, 'echo hello')
-        self.assertEqual(self.mock.last_kwargs, dict(timeout=5))
+        Accessor.run('echo hello')
+        self.assertEqual(self.mock.last, {
+            'command': 'echo hello',
+            'sudo': False
+        })
 
     def test_sudo(self):
         Accessor.sudo('echo boo')
-        self.assertEqual(self.mock.last_command, 'echo boo')
-        self.assertEqual(self.mock.last_kwargs, {})
+        self.assertEqual(self.mock.last, {
+            'command': 'echo boo',
+            'sudo': True
+        })

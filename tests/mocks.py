@@ -5,14 +5,19 @@ class MockFabric(object):
     would have run
     '''
     def __init__(self):
-        self.env = {
-            'use_ssh_config': True
-        }
-        self.command_history = []
-        self.run = self._record
-        self.sudo = self._record
+        self.history = []
+        self.last = {}
+        self.env = {}
 
-    def _record(self, *args, **kwargs):
-        self.last_command = ''.join(args)
-        self.last_kwargs = kwargs
-        self.command_history.append(self.last_command)
+    def sudo(self, cmd):
+        self._shell_command(cmd, True)
+
+    def run(self, cmd):
+        self._shell_command(cmd, False)
+
+    def _shell_command(self, cmd, sudo):
+        self.last = {
+            'command': cmd,
+            'sudo': sudo
+        }
+        self.history.append(self.last)

@@ -136,34 +136,34 @@ class TestHandShake(ServoTestCase):
         default value if none given
         '''
         HandShake().go()
-        self.assertEqual(
-            self.mock.last_command,
-            'echo "Hellooooooo nurse"'
-        )
+        self.assertEqual(self.mock.last, {
+            'command': 'echo "Hellooooooo nurse"',
+            'sudo': False
+        })
 
     def test_go(self):
         '''
         should execute with a custom message
         '''
         HandShake({'hello': 'test message'}).go()
-        self.assertEqual(
-            self.mock.last_command,
-            'echo "test message"'
-        )
+        self.assertEqual(self.mock.last, {
+            'command': 'echo "test message"',
+            'sudo': False
+        })
 
     def test_default_nuke(self):
         HandShake().nuke()
-        self.assertEqual(
-            self.mock.last_command,
-            'echo "You ever see a podrace?"'
-        )
+        self.assertEqual(self.mock.last, {
+            'command': 'echo "You ever see a podrace?"',
+            'sudo': False
+        })
 
     def test_nuke(self):
         HandShake({'goodbye': 'test message'}).nuke()
-        self.assertEqual(
-            self.mock.last_command,
-            'echo "test message"'
-        )
+        self.assertEqual(self.mock.last, {
+            'command': 'echo "test message"',
+            'sudo': False
+        })
 
 
 class TestInstaller(ServoTestCase):
@@ -180,27 +180,19 @@ class TestInstaller(ServoTestCase):
 
     def test_defaults(self):
         Installer({
-            'packages': [
-                'python',
-                'nmap',
-                'mysql'
-            ]
+            'packages': ['python', 'nmap', 'mysql']
         }).validate().go()
-        self.assertEqual(
-            self.mock.last_command,
-            'sudo apt-get install -y python nmap mysql'
-        )
+        self.assertEqual(self.mock.last, {
+            'command': 'apt-get install -y python nmap mysql',
+            'sudo': True
+        })
 
     def test_command_override(self):
         Installer({
-            'command': 'sudo pacman -S',
-            'packages': [
-                'python',
-                'nmap',
-                'mysql'
-            ]
+            'command': 'pacman -S',
+            'packages': ['python', 'nmap', 'mysql']
         }).validate().go()
-        self.assertEqual(
-            self.mock.last_command,
-            'sudo pacman -S python nmap mysql'
-        )
+        self.assertEqual(self.mock.last, {
+            'command': 'pacman -S python nmap mysql',
+            'sudo': True
+        })

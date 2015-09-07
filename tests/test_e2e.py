@@ -1,41 +1,8 @@
-from unittest import TestCase
-import os
-
-from click.testing import CliRunner
-
-from msg.cli import main
-from msg import server
-from msg.server import api
 from msg import exceptions
-from mocks import MockFabric
-from utils import get_root
+from mocks import MockFabricTestCase
 
 
-class MockMSGTestCase(TestCase):
-    '''
-    writes out config file and removes it
-    '''
-    def setUp(self):
-        self.cli = CliRunner()
-        server.api = self.mock = MockFabric()
-        server.files = self.mock._files
-        self.config = os.path.join(get_root(), 'test_config.yml')
-        with open(self.config, 'w+') as file:
-            file.write(self.config_data)
-
-    def prod(self):
-        self.cli.invoke(main, ['prod', self.config])
-        self.assertEqual(self.mock.history, self.expected)
-
-    def tearDown(self):
-        server.api = api
-        try:
-            os.remove(self.config)
-        except OSError:
-            pass
-
-
-class TestHandShakeInstallerConfig(MockMSGTestCase):
+class TestHandShakeInstallerConfig(MockFabricTestCase):
     config_data = '''
 host:
   prod: 'prod-host'
@@ -57,10 +24,10 @@ servos:
     }]
 
     def test(self):
-        super(TestHandShakeInstallerConfig, self).prod()
+        self.cli_prod()
 
 
-class TestHandShakeInstallerConfigOverrides(MockMSGTestCase):
+class TestHandShakeInstallerConfigOverrides(MockFabricTestCase):
     config_data = '''
 host:
   prod: 'test-server'
@@ -85,10 +52,10 @@ servos:
     }]
 
     def test(self):
-        super(TestHandShakeInstallerConfigOverrides, self).prod()
+        self.cli_prod()
 
 
-class TestInstallerMissingReqs(MockMSGTestCase):
+class TestInstallerMissingReqs(MockFabricTestCase):
     config_data = '''
 host:
   prod: 'prod-host'
@@ -101,13 +68,13 @@ servos:
 
     def test_it(self):
         try:
-            self.cli.invoke(main, ['stage', self.config])
+            self.cli_prod
         except exceptions.MSGException as e:
             self.assertEqual(len(e.errors), 1)
             self.assertEqual(e.errors[0].fields, ['packages'])
 
 
-class TestHost(MockMSGTestCase):
+class TestHost(MockFabricTestCase):
     config_data = '''
 host:
   prod: 'prod-host'
@@ -123,4 +90,4 @@ servos:
     }]
 
     def test(self):
-        super(TestHost, self).prod()
+        self.cli_prod()

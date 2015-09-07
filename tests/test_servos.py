@@ -2,10 +2,8 @@ from unittest import TestCase
 
 from msg.server import Accessor
 from msg import servos
-from msg import server
-from msg.server import api
 from msg.exceptions import ServoMissingFieldsException
-from mocks import MockFabric
+from mocks import MockFabricTestCase
 
 
 class TestBaseServo(TestCase):
@@ -118,16 +116,7 @@ class TestBaseServo(TestCase):
             self.assertEqual(e.fields, ['here', ])
 
 
-class ServoTestCase(TestCase):
-    def setUp(self):
-        server.api = self.mock = MockFabric()
-        server.files = self.mock._files
-
-    def tearDown(self):
-        server.api = api
-
-
-class TestHandShake(ServoTestCase):
+class TestHandShake(MockFabricTestCase):
     '''
     exercise the Handshake servo
     '''
@@ -167,7 +156,7 @@ class TestHandShake(ServoTestCase):
         })
 
 
-class TestInstaller(ServoTestCase):
+class TestInstaller(MockFabricTestCase):
     '''
     excercise installer servo
     '''
@@ -199,7 +188,7 @@ class TestInstaller(ServoTestCase):
         })
 
 
-class TestHost(ServoTestCase):
+class TestHost(MockFabricTestCase):
     '''
     excercise host servo
     '''

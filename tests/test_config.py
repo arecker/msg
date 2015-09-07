@@ -1,16 +1,13 @@
-from unittest import TestCase
-import os
-
 from msg.config import Kicker
 from msg import exceptions
-from utils import get_root
+from mocks import MockFabricTestCase
 
 
-class TestKicker(TestCase):
+class TestKicker(MockFabricTestCase):
     '''
     exercises the kicker object
     '''
-    mock = '''
+    mock_data = '''
 test: this is a test attribute
 collection:
   - first
@@ -38,28 +35,11 @@ subitems:
         '''
         should return a data object from a yaml string
         '''
-        self.assertEqual(Kicker(data=self.mock).data, self.expected)
-
-    def test_parse_file(self):
-        '''
-        should return a data object from a yaml file
-        '''
-        try:
-            target = os.path.join(get_root(), 'test_config.yml')
-            with open(target, 'w+') as file:
-                file.write(self.mock)
-
-            actual = Kicker(path=target).data
-            self.assertEqual(actual, self.expected)
-        finally:
-            try:
-                os.remove(target)
-            except OSError:
-                pass
+        self.assertEqual(Kicker(data=self.mock_data).data, self.expected)
 
     def test_parse_nothing(self):
         '''
-        should just return an empty dict if
+        should thrown an exception if
         given nothing to parse
         '''
         with self.assertRaises(exceptions.MSGConfigParseException):

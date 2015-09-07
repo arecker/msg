@@ -91,8 +91,27 @@ class Installer(BaseServo):
         ))
 
 
+class Host(BaseServo):
+    '''
+    servo that manipulates the host file
+    '''
+    def __init__(self, data):
+        super(Host, self).__init__(data)
+        self.short = not isinstance(self.config, dict)
+
+    def validate(self):
+        '''
+        overrides base since there is a simple and complicated
+        version of the config
+        '''
+        if self.short:
+            if len(self.config) < 1:
+                raise ServoMissingFieldsException(fields=['host'])
+
+
 # key/class map
 manifest = {
     'handshake': HandShake,
-    'install': Installer
+    'install': Installer,
+    'host': Host
 }

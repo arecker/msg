@@ -6,6 +6,12 @@ from click.testing import CliRunner
 from msg.cli import main, prod, stage
 from mocks import MockFabricTestCase
 
+# TODO: Right now these are just testing exit statuses
+# They should probably be modified to check error output too
+# to ensure the right output is there.
+# But not hard coded assertions.  Probably keep all error
+# strings in one place - you know - like a smart person would.
+
 
 class TestCliSanity(TestCase):
     '''

@@ -278,3 +278,25 @@ class TestClone(MockFabricTestCase):
             'command': 'git clone http://google.com/.git ~/google',
             'sudo': False
         })
+
+
+class TestUntar(MockFabricTestCase):
+    def test_go(self):
+        servos.Untar({
+            'source': '/tmp/test.tar.gz',
+            'destination': '/tmp/test'
+        }).validate().go()
+        self.assertEqual(self.mock.last, {
+            'command': 'tar xvf /tmp/test.tar.gz -C /tmp/test',
+            'sudo': False
+        })
+
+class TestRemove(MockFabricTestCase):
+    def test_go(self):
+        servos.Remove({
+            'target': '/tmp/test'
+        }).validate().go()
+        self.assertEqual(self.mock.last, {
+            'command': 'rm /tmp/test',
+            'sudo': False
+        })

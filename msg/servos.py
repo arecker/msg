@@ -139,11 +139,35 @@ class Clone(BaseServo):
         self.run('git clone {0} {1}'.format(url, target))
 
 
+class Untar(BaseServo):
+    '''
+    servo that untars a file to a location
+    '''
+    required = ['source', 'destination']
+
+    def go(self):
+        source = self.config['source']
+        dest = self.config['destination']
+        self.run('tar xvf {0} -C {1}'.format(source, dest))
+
+
+class Remove(BaseServo):
+    '''
+    servo that deletes a file
+    '''
+    required = ['target']
+
+    def go(self):
+        self.run('rm {0}'.format(self.config['target']))
+
+
 # key/class map
 manifest = {
     'handshake': HandShake,
     'install': Installer,
     'host': Host,
     'put': Put,
-    'clone': Clone
+    'clone': Clone,
+    'untar': Untar,
+    'remove': Remove
 }

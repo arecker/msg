@@ -151,6 +151,18 @@ class Untar(BaseServo):
         self.run('tar xvf {0} -C {1}'.format(source, dest))
 
 
+class Unzip(BaseServo):
+    '''
+    servo that unzips a ZIP
+    '''
+    required = ['source', 'destination']
+
+    def go(self):
+        source = self.config['source']
+        dest = self.config['destination']
+        self.run('unzip {0} -d {1}'.format(source, dest))
+
+
 class Remove(BaseServo):
     '''
     servo that deletes a file

@@ -291,6 +291,19 @@ class TestUntar(MockFabricTestCase):
             'sudo': False
         })
 
+
+class TestUnzip(MockFabricTestCase):
+    def test_go(self):
+        servos.Unzip({
+            'source': '/tmp/test.zip',
+            'destination': '/tmp/test'
+        }).validate().go()
+        self.assertEqual(self.mock.last, {
+            'command': 'unzip /tmp/test.zip -d /tmp/test',
+            'sudo': False
+        })
+
+
 class TestRemove(MockFabricTestCase):
     def test_go(self):
         servos.Remove({

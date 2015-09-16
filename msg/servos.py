@@ -111,15 +111,9 @@ class Host(BaseServo):
         if self.short:
             if len(self.config) < 1:
                 raise ServoMissingFieldsException(fields=['host'])
-        else:
-            raise NotImplementedError('only short mode available')
         return self
 
     def go(self):
-        if self.short:
-            self._short_go()
-
-    def _short_go(self):
         self.append('/etc/hosts', self.to_host('127.0.0.1', self.config), True)
 
 

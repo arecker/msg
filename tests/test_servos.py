@@ -313,3 +313,67 @@ class TestRemove(MockFabricTestCase):
             'command': 'rm /tmp/test',
             'sudo': False
         })
+
+
+class TestPayload(MockFabricTestCase):
+    def test_go_zip(self):
+        servos.Payload({
+            'payload': '/local/test.zip',
+            'destination': '/var/web/test'
+        }).validate().go()
+        self.assertEqual(self.mock.history, [{
+            'put': '/local/test.zip',
+            'destination': '/tmp',
+            'sudo': False
+        }, {
+            'command': 'unzip /tmp/test.zip -d /var/web/test',
+            'sudo': False
+        }, {
+            'command': 'rm /tmp/test.zip',
+            'sudo': False
+        }])
+
+    def test_go_tar1(self):
+        servos.Payload({
+            'payload': '/local/test.tar',
+            'destination': '/var/web/test',
+            'temp': '/temp'
+        }).validate().go()
+        self.assertEqual(self.mock.history, [{
+            'put': '/local/test.tar',
+            'destination': '/temp',
+            'sudo': False
+        }, {
+            'command': 'tar xvf /temp/test.tar -C /var/web/test',
+            'sudo': False
+        }, {
+            'command': 'rm /temp/test.tar',
+            'sudo': False
+        }])
+
+    def test_go_tar2(self):
+        servos.Payload({
+            'payload': '/local/test.tar.gz',
+            'destination': '/var/web/test',
+        }).validate().go()
+        self.assertEqual(self.mock.history, [{
+            'put': '/local/test.tar.gz',
+            'destination': '/tmp',
+            'sudo': False
+        }, {
+            'command': 'tar xvf /tmp/test.tar.gz -C /var/web/test',
+            'sudo': False
+        }, {
+            'command': 'rm /tmp/test.tar.gz',
+            'sudo': False
+        }])
+
+    def test_validate(self):
+        try:
+            servos.Payload({
+                'payload': '/something',
+                'destination': 'bleh'
+            }).validate().go()
+            self.fail('Invalid config passed')
+        except ServoMissingFieldsException as e:
+            self.assertEqual(e.fields, ['payload'])

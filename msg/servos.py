@@ -1,4 +1,6 @@
 from copy import deepcopy
+import os
+import ntpath
 
 from server import Accessor
 from exceptions import ServoMissingFieldsException
@@ -173,6 +175,48 @@ class Remove(BaseServo):
         self.run('rm {0}'.format(self.config['target']))
 
 
+class Payload(BaseServo):
+    '''
+    servo that puts a payload on the server.
+    Depending on its file extension, it will
+    open it and remove the package.
+    '''
+    required = ['payload', 'destination']
+    defaults = {'temp': '/tmp'}
+    extensions = {
+        '.tar': Untar,
+        '.gz': Untar,
+        '.zip': Unzip
+    }
+
+    def validate(self):
+        super(Payload, self).validate()
+        ext = os.path.splitext(self.config['payload'])[1]
+        self.undresser = self.extensions.get(ext, None)
+        if not self.undresser:
+            raise ServoMissingFieldsException(fields=['payload'])
+        return self
+
+    def go(self):
+        local_payload = self.config['payload']
+        payload_filename = ntpath.basename(local_payload)
+        destination = self.config['destination']
+        temp = self.config['temp']
+        remote_payload = (os.path.join(temp, payload_filename))
+
+        Put({
+            'source': local_payload,
+            'destination': temp
+        }).go()
+
+        self.undresser({
+            'source': remote_payload,
+            'destination': destination
+        }).go()
+
+        Remove({'target': remote_payload}).go()
+
+
 # key/class map
 manifest = {
     'handshake': HandShake,
@@ -181,5 +225,7 @@ manifest = {
     'put': Put,
     'clone': Clone,
     'untar': Untar,
-    'remove': Remove
+    'unzip': Unzip,
+    'remove': Remove,
+    'payload': Payload
 }

@@ -14,9 +14,6 @@ from mocks import MockFabricTestCase
 
 
 class TestCliSanity(TestCase):
-    '''
-    tests basic app cli interaction
-    '''
     def setUp(self):
         self.runner = CliRunner()
 

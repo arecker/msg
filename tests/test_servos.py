@@ -7,22 +7,12 @@ from mocks import MockFabricTestCase
 
 
 class TestBaseServo(TestCase):
-    '''
-    exercises base servo class
-    '''
     def test_init_accessor_passes(self):
-        '''
-        should pass through to accessor api
-        '''
         obj = servos.BaseServo()
         self.assertEqual(obj.run, Accessor.run)
         self.assertEqual(obj.sudo, Accessor.sudo)
 
     def test_init_data_dict(self):
-        '''
-        should save off data, or default to an empty
-        dict if none given
-        '''
         obj = servos.BaseServo()
         self.assertEqual(obj.config, {})
         expected = {
@@ -34,10 +24,6 @@ class TestBaseServo(TestCase):
         self.assertEqual(obj.config, expected)
 
     def test_defaults_loaded_in_config(self):
-        '''
-        should load the config object with
-        specified defaults
-        '''
         class MockServo(servos.BaseServo):
             defaults = {
                 'one': 1,
@@ -62,10 +48,6 @@ class TestBaseServo(TestCase):
         self.assertEqual(obj.config, expected)
 
     def test_not_implemented(self):
-        '''
-        custom servo without defined
-        routines should raise a NI expection
-        '''
         class MockServo(servos.BaseServo):
             pass
 
@@ -74,10 +56,6 @@ class TestBaseServo(TestCase):
                 getattr(MockServo(), method)()
 
     def test_validate_no_required(self):
-        '''
-        servo should validate config just fine
-        if no required fields defined
-        '''
         class MockServo(servos.BaseServo):
             pass
 
@@ -87,9 +65,6 @@ class TestBaseServo(TestCase):
             self.fail('failed to validate with no required fields')
 
     def test_validate_pass(self):
-        '''
-        servo should validate when required fields are fulfilled
-        '''
         class MockServo(servos.BaseServo):
             required = ['something']
 
@@ -99,10 +74,6 @@ class TestBaseServo(TestCase):
             self.fail('failed to validate with good config')
 
     def test_validate_fail(self):
-        '''
-        servo should raise when config is missing required
-        fields.  should store missing items in the exception
-        '''
         class MockServo(servos.BaseServo):
             required = ['something', 'here']
         mock = {'something': 'hello'}
@@ -117,14 +88,7 @@ class TestBaseServo(TestCase):
 
 
 class TestHandShake(MockFabricTestCase):
-    '''
-    exercise the Handshake servo
-    '''
     def test_default_go(self):
-        '''
-        should execute a message with the
-        default value if none given
-        '''
         servos.HandShake().go()
         self.assertEqual(self.mock.last, {
             'command': 'echo "Hellooooooo nurse"',
@@ -132,9 +96,6 @@ class TestHandShake(MockFabricTestCase):
         })
 
     def test_go(self):
-        '''
-        should execute with a custom message
-        '''
         servos.HandShake({'hello': 'test message'}).go()
         self.assertEqual(self.mock.last, {
             'command': 'echo "test message"',
@@ -157,9 +118,6 @@ class TestHandShake(MockFabricTestCase):
 
 
 class TestInstaller(MockFabricTestCase):
-    '''
-    excercise installer servo
-    '''
     def test_validate(self):
         obj = servos.Installer({})
         try:
@@ -200,31 +158,19 @@ class TestInstaller(MockFabricTestCase):
 
 
 class TestHost(MockFabricTestCase):
-    '''
-    excercise host servo
-    '''
     def test_validate_short(self):
-        '''
-        should validate against the shortcut version
-        '''
         try:
             servos.Host('alexrecker.com').validate()
         except:
             self.fail('valid host failed validation')
 
     def test_validate_short_fail(self):
-        '''
-        should fail an empty string as a hostname
-        '''
         try:
             servos.Host('').validate()
         except ServoMissingFieldsException as e:
             self.assertEqual(e.fields, ['host'])
 
     def test_run_short(self):
-        '''
-        should append a hostname to the hostfile
-        '''
         servos.Host('alexrecker.com').validate().go()
         self.assertEqual(self.mock.last, {
             'file': '/etc/hosts',

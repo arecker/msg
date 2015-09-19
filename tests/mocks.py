@@ -24,6 +24,14 @@ class MockFiles(object):
             'sudo': sudo
         })
 
+    def upload_template(self, template, destination, **kwargs):
+        self.callback({
+            'template': template,
+            'destination': destination,
+            'data': kwargs['context'],
+            'sudo': kwargs['use_sudo']
+        })
+
 
 class MockOperations(object):
     '''

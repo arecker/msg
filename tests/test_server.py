@@ -63,3 +63,13 @@ class TestAccessorCommands(MockFabricTestCase):
             'destination': 'destination file',
             'sudo': False
         })
+
+    def test_template(self):
+        Accessor.template(
+            'test.txt', '/etc/site', data={'test': False}, sudo=True)
+        self.assertEqual(self.mock.last, {
+            'template': 'test.txt',
+            'destination': '/etc/site',
+            'data': {'test': False},
+            'sudo': True
+        })

@@ -1,6 +1,7 @@
 from fabric import api, operations
 from fabric.contrib import files
 
+import os
 
 class Accessor(object):
     '''
@@ -34,3 +35,14 @@ class Accessor(object):
     @staticmethod
     def put(*args, **kwargs):
         return operations.put(*args, **kwargs)
+
+    @staticmethod
+    def template(template, dest, data, sudo=False):
+        return files.upload_template(
+            template, dest, context=data, use_jinja=True,
+            template_dir=os.path.join(
+                os.path.dirname(
+                    os.path.realpath(__file__)
+                ), 'templates'),
+            use_sudo=True
+        )

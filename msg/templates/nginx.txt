@@ -1,0 +1,8 @@
+server {
+
+        listen {{ port }};
+        server_name {{ hostname }};
+        root {{ root }};
+        index {{ index_files | join(' ') }};
+
+}

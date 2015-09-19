@@ -61,8 +61,8 @@ class MockFabric(object):
         self._files = MockFiles(self._callback)
         self._operations = MockOperations(self._callback)
 
-    def sudo(self, cmd):
-        self._shell_command(cmd, True)
+    def sudo(self, cmd, user=None):
+        self._shell_command(cmd, True, user=user)
 
     def run(self, cmd):
         self._shell_command(cmd, False)
@@ -71,11 +71,13 @@ class MockFabric(object):
         self.history.append(obj)
         self.last = obj
 
-    def _shell_command(self, cmd, sudo):
+    def _shell_command(self, cmd, sudo, user=None):
         self.last = {
             'command': cmd,
             'sudo': sudo
         }
+        if user:
+            self.last['user'] = user
         self.history.append(self.last)
 
 

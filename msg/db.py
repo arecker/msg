@@ -12,7 +12,7 @@ class BaseDatabaseController(object):
 
 
 class PostgresController(BaseDatabaseController):
-    pass
+    user = 'postgres'
 
 
 class MysqlController(BaseDatabaseController):

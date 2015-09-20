@@ -20,6 +20,7 @@ class BaseServo(object):
         self.sudo = Accessor.sudo
         self.append = Accessor.append
         self.put = Accessor.put
+        self.template = Accessor.template
 
     def _build_config(self, data):
         '''
@@ -197,6 +198,23 @@ class Symlink(BaseServo):
         if self.config['sudo']:
             return self.sudo(command)
         return self.run(command)
+
+
+class Render(BaseServo):
+    '''
+    servo that renders data through a
+    jinja template
+    '''
+    required = ['name', 'destination', 'data']
+    defaults = {'sudo': False}
+
+    def go(self):
+        return self.template(
+            self.config['name'],
+            self.config['destination'],
+            self.config['data'],
+            sudo=self.config['sudo']
+        )
 
 
 class Payload(BaseServo):

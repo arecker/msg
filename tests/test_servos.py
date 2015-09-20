@@ -285,6 +285,36 @@ class TestSymlink(MockFabricTestCase):
         })
 
 
+class TestRender(MockFabricTestCase):
+    def test_go(self):
+        servos.Render({
+            'name': 'nginx.txt',
+            'destination': '/etc/nginx/sites-available/test',
+            'data': {
+                'port': 80,
+                'hostname': 'itsworking.local',
+                'root': '/var/www/itsworking',
+                'index_files': [
+                    'index.html',
+                    'index.htm'
+                ],
+            }, 'sudo': True
+        }).validate().go()
+        self.assertEqual(self.mock.last, {
+            'template': 'nginx.txt',
+            'destination': '/etc/nginx/sites-available/test',
+            'data': {
+                'port': 80,
+                'hostname': 'itsworking.local',
+                'root': '/var/www/itsworking',
+                'index_files': [
+                    'index.html',
+                    'index.htm'
+                ],
+            }, 'sudo': True
+        })
+
+
 class TestPayload(MockFabricTestCase):
     def test_go_zip(self):
         servos.Payload({

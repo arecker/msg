@@ -147,3 +147,60 @@ servos:
     def test(self):
         self.prod()
         self.compare()
+
+
+class TestSite(MockFabricTestCase):
+    config_data = '''
+host:
+  prod: 'test-lorelai'
+
+servos:
+  - install: nginx
+  - site:
+      server: nginx
+      hostname: itsworking.local
+      payload: /home/alex/Desktop/its.working.tar.gz
+      root: /var/www/itsworking
+'''
+
+    expected = [{
+        'command': 'apt-get install -y nginx',
+        'sudo': True
+    }, {
+        'put': '/home/alex/Desktop/its.working.tar.gz',
+        'destination': '/tmp',
+        'sudo': False
+    }, {
+        'command': 'tar xvf /tmp/its.working.tar.gz -C /var/www/itsworking',
+        'sudo': False
+    }, {
+        'command': 'rm /tmp/its.working.tar.gz',
+        'sudo': False
+    }, {
+        'template': 'nginx.txt',
+        'destination': '/etc/nginx/sites-available/itsworking.local',
+        'data': {
+            'port': 80,
+            'hostname': 'itsworking.local',
+            'root': '/var/www/itsworking',
+            'index_files': [
+                'index.html',
+                'index.htm'
+            ],
+        }, 'sudo': True
+    }, {
+        'command': 'ln -s /etc/nginx/sites-available/itsworking.local ' +
+        '/etc/nginx/sites-enabled/itsworking.local',
+        'sudo': True
+    }, {
+        'file': '/etc/hosts',
+        'append': '127.0.0.1     itsworking.local',
+        'sudo': True
+    }, {
+        'command': 'systemctl reload nginx',
+        'sudo': True
+    }]
+
+    def test(self):
+        self.prod()
+        self.compare()

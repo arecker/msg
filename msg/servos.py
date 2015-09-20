@@ -2,6 +2,7 @@ from copy import deepcopy
 import os
 import ntpath
 
+import daemon
 from server import Accessor
 from exceptions import ServoMissingFieldsException
 
@@ -259,6 +260,48 @@ class Payload(BaseServo):
         Remove({'target': remote_payload}).go()
 
 
+class Site(BaseServo):
+    '''
+    servo that deploys a static website
+    '''
+    required = ['server', 'hostname', 'payload', 'root']
+
+    def go(self):
+        hostname = self.config['hostname']
+        payload = self.config['payload']
+        root = self.config['root']
+
+        avail_config = '/etc/nginx/sites-available/{0}'.format(hostname)
+        enable_config = '/etc/nginx/sites-enabled/{0}'.format(hostname)
+
+        Payload({
+            'payload': payload,
+            'destination': root
+        }).validate().go()
+
+        Render({
+            'name': 'nginx.txt',
+            'destination': avail_config,
+            'data': {
+                'port': 80,
+                'hostname': hostname,
+                'root': root,
+                'index_files': [
+                    'index.html',
+                    'index.htm'
+                ]
+            }, 'sudo': True
+        }).validate().go()
+
+        Symlink({
+            'source': avail_config,
+            'destination': enable_config,
+            'sudo': True
+        }).validate().go()
+
+        Host(hostname).validate().go()
+        daemon.SystemDController().reload('nginx')
+
 # key/class map
 manifest = {
     'handshake': HandShake,
@@ -269,5 +312,7 @@ manifest = {
     'untar': Untar,
     'unzip': Unzip,
     'remove': Remove,
-    'payload': Payload
+    'link': Symlink,
+    'payload': Payload,
+    'site': Site
 }

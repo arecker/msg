@@ -261,6 +261,30 @@ class TestRemove(MockFabricTestCase):
         })
 
 
+class TestSymlink(MockFabricTestCase):
+    def test_go_1(self):
+        servos.Symlink({
+            'source': '/tmp/file',
+            'destination': '/var/file_link'
+        }).validate().go()
+        self.assertEqual(self.mock.last, {
+            'command': 'ln -s /tmp/file /var/file_link',
+            'sudo': False
+        })
+
+    def test_go_2(self):
+        servos.Symlink({
+            'source': '/tmp/file',
+            'destination': '/var/file_link',
+            'soft': False,
+            'sudo': True
+        }).validate().go()
+        self.assertEqual(self.mock.last, {
+            'command': 'ln /tmp/file /var/file_link',
+            'sudo': True
+        })
+
+
 class TestPayload(MockFabricTestCase):
     def test_go_zip(self):
         servos.Payload({

@@ -175,6 +175,30 @@ class Remove(BaseServo):
         self.run('rm {0}'.format(self.config['target']))
 
 
+class Symlink(BaseServo):
+    '''
+    servo that creates a symlink
+    '''
+    required = ['source', 'destination']
+    defaults = {
+        'soft': True,
+        'sudo': False
+    }
+
+    def go(self):
+        source = self.config['source']
+        dest = self.config['destination']
+
+        if self.config['soft']:
+            command = 'ln -s {0} {1}'.format(source, dest)
+        else:
+            command = 'ln {0} {1}'.format(source, dest)
+
+        if self.config['sudo']:
+            return self.sudo(command)
+        return self.run(command)
+
+
 class Payload(BaseServo):
     '''
     servo that puts a payload on the server.
